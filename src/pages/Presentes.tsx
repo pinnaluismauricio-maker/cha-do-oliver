@@ -239,6 +239,15 @@ export default function Presentes() {
         por tamanho.
       </p>
 
+      <div className="alert">
+  <strong>OBSERVAÇÃO IMPORTANTE:</strong>
+  <p>
+    Para participar, pedimos que cada convidado escolha
+    <strong> 1 pacote de fralda e 1 mimo</strong>.
+    Assim, conseguimos organizar melhor os presentes para o Oliver. 💙
+  </p>
+</div>
+
       {totalSlots > 0 && (
         <div className="progress">
           <div
