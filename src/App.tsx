@@ -4,6 +4,7 @@ import Shell from './pages/Shell'
 import Presentes from './pages/Presentes'
 import Confirmar from './pages/Confirmar'
 import Local from './pages/Local'
+import Musica from './Musica'
 
 type Route = 'home' | 'presente' | 'confirmar' | 'local'
 const PAGES = ['presente', 'confirmar', 'local']
@@ -28,6 +29,7 @@ export default function App() {
   return (
     <>
       <div className="bg" aria-hidden="true" />
+      <Musica />
       <div className="sheet">
         {route === 'home' && <Home />}
         {route === 'presente' && (

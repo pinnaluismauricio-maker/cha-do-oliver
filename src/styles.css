@@ -1,3 +1,4 @@
+/* Layout: convite em coluna única (foto no topo, nome em letra cursiva, três fases em medalhões) com toldo de carrossel */
 :root {
   --bg: #eaf4fd;
   --surface: #ffffff;
@@ -521,6 +522,25 @@ button:disabled {
   background: var(--ink);
   border-radius: 99px;
   transform: translateX(-50%);
+}
+/* Botão de música (canto da folha do convite) */
+.music-btn {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: 0 6px 18px rgba(10, 30, 60, 0.3);
+}
+@media (min-width: 640px) {
+  .music-btn {
+    right: calc(50vw - 280px + 14px);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .bar > i,

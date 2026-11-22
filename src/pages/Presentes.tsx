@@ -7,7 +7,7 @@ type Item = {
   name: string
   category: string
   link: string | null
-  max_claims: number
+  max_claims: number | null // nulo = sem limite
   sort: number
 }
 type Claim = { id: string; item_id: string; guest_name: string; created_at: string }
@@ -103,8 +103,10 @@ export default function Presentes() {
     return order.map((category) => ({ category, items: map.get(category)! }))
   }, [items])
 
-  const totalSlots = items.reduce((sum, it) => sum + it.max_claims, 0)
-  const taken = items.reduce((sum, it) => sum + (claimsByItem.get(it.id)?.length ?? 0), 0)
+  // A barra de progresso só conta os itens com limite (as fraldas). Os mimos são ilimitados.
+  const limited = items.filter((it) => it.max_claims !== null)
+  const totalSlots = limited.reduce((sum, it) => sum + (it.max_claims ?? 0), 0)
+  const taken = limited.reduce((sum, it) => sum + (claimsByItem.get(it.id)?.length ?? 0), 0)
   const pct = totalSlots ? Math.round((taken / totalSlots) * 100) : 0
 
   async function claim(item: Item) {
@@ -159,8 +161,8 @@ export default function Presentes() {
   return (
     <div className="stack">
       <p className="msg">
-        Escolha um presente da lista e deixe seu nome. Os mimos saem da lista depois de escolhidos, e algumas
-        opções aceitam mais de uma pessoa.
+        Escolha um presente da lista e deixe seu nome. Mais de uma pessoa pode escolher o mesmo mimo, e as fraldas
+        têm um limite de pacotes por tamanho.
       </p>
 
       {totalSlots > 0 && (
@@ -172,7 +174,7 @@ export default function Presentes() {
             <span className="count">
               {taken} de {totalSlots}
             </span>{' '}
-            <span className="note">presentes já escolhidos</span>
+            <span className="note">pacotes de fralda já escolhidos</span>
           </p>
         </div>
       )}
@@ -201,15 +203,17 @@ export default function Presentes() {
           <ul className="items">
             {g.items.map((it) => {
               const list = claimsByItem.get(it.id) ?? []
-              const left = it.max_claims - list.length
-              const full = left <= 0
+              const limit = it.max_claims
+              const left = limit === null ? Infinity : limit - list.length
+              const full = limit !== null && left <= 0
+              const unit = /fralda/i.test(it.name) ? 'pacotes' : 'unidades'
               return (
                 <li key={it.id} className={`item${full ? ' taken' : ''}`}>
                   <div className="info">
                     <span className="name">{it.name}</span>
-                    {it.max_claims > 1 && (
+                    {limit !== null && limit > 1 && (
                       <span className="by">
-                        {full ? 'Todas as unidades foram escolhidas' : `${left} de ${it.max_claims} disponíveis`}
+                        {full ? `Todos os ${unit} foram escolhidos` : `${left} de ${limit} ${unit} disponíveis`}
                       </span>
                     )}
                     {isHttp(it.link) && (
@@ -235,10 +239,13 @@ export default function Presentes() {
                       </ul>
                     )}
                   </div>
-                  {!full && (
-                    <button type="button" disabled={busy === it.id} onClick={() => claim(it)}>
-                      {busy === it.id ? 'Salvando…' : 'Vou levar'}
-                    </button>
+                  <button
+                 type="button"
+                  disabled={busy === it.id}
+                    onClick={() => claim(it)}
+>
+  {busy === it.id ? 'Salvando…' : 'Vou levar'}
+</button>
                   )}
                 </li>
               )
